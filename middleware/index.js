@@ -19,6 +19,32 @@ const validateProjectId = async (req, res, next) => {
   }
 }
 
+const validateProjectBody = (req, res, next) => {
+  try {
+    if (Object.keys(req.body).length === 0) {
+      res.status(400).json({
+        error: `Cannot process request with an empty body`
+      })
+    } else {
+      const { name, description, completed } = req.body
+      if (!name || !description || typeof completed !== 'boolean') {
+        res.status(400).json({
+          error: `Missing data! Please include all fields (name, description, and completed)`
+        })
+      } else {
+        const project = { name, description, completed }
+        req['project'] = project
+        next()
+      }
+    }
+  } catch (error) {
+    res.status(500).json({
+      error: `An error occurred while attmepting to validate the project's data`
+    })
+  }
+}
+
 module.exports = {
-  validateProjectId
+  validateProjectId,
+  validateProjectBody
 }
