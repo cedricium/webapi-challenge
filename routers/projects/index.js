@@ -31,7 +31,7 @@ router.post('/', validateProjectBody, async (req, res) => {
     res.status(201).json({ ...newProject })
   } catch (error) {
     res.status(500).json({
-      error: `An error occurred while attempting to get the projects`
+      error: `An error occurred while attempting to add the new project`
     })
   }
 })
@@ -43,17 +43,20 @@ router.delete('/:id', validateProjectId, async (req, res) => {
     res.status(204).end()
   } catch (error) {
     res.status(500).json({
-      error: `An error occurred while attempting to get the projects`
+      error: `An error occurred while attempting to delete the project`
     })
   }
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateProjectId, validateProjectBody, async (req, res) => {
   try {
-
+    const { project } = req
+    const { id } = req.params
+    const updatedProject = await db.update(id, project)
+    res.status(200).json({ ...updatedProject })
   } catch (error) {
     res.status(500).json({
-      error: `An error occurred while attempting to get the projects`
+      error: `An error occurred while attempting to update the project`
     })
   }
 })
