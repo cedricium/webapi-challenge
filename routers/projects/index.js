@@ -36,9 +36,11 @@ router.post('/', validateProjectBody, async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validateProjectId, async (req, res) => {
   try {
-
+    const { id } = req.params
+    await db.remove(id)
+    res.status(204).end()
   } catch (error) {
     res.status(500).json({
       error: `An error occurred while attempting to get the projects`
