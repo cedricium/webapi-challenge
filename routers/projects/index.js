@@ -1,6 +1,9 @@
 const router = require('express').Router()
+const actionsRouter = require('../actions')
 const db = require('../../data/helpers/projectModel')
 const { validateProjectId, validateProjectBody } = require('../../middleware')
+
+router.use('/:id/actions', validateProjectId, actionsRouter)
 
 router.get('/', async (req, res) => {
   try {
