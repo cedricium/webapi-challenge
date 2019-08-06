@@ -1,6 +1,7 @@
 const router = require('express').Router({ mergeParams: true })
 const db = require('../../data/helpers/actionModel')
 const { getProjectActions } = require('../../data/helpers/projectModel')
+const { validateActionId, validateActionBody } = require('../../middleware')
 
 router.get('/', async (req, res) => {
   try {
@@ -14,19 +15,17 @@ router.get('/', async (req, res) => {
   }
 })
 
-router.get('/id', async (req, res) => {
+router.post('/', validateActionBody, async (req, res) => {
   try {
-
-  } catch (error) {
-    res.status(500).json({
-      error: `An error occurred while attempting to get the action`
+    const { action, project } = req
+    const { id } = project
+    const { description, notes } = action
+    const newAction = await db.insert({
+      project_id: id,
+      description,
+      notes
     })
-  }
-})
-
-router.post('/:id', async (req, res) => {
-  try {
-
+    res.status(201).json({ ...newAction })
   } catch (error) {
     res.status(500).json({
       error: `An error occurred while attempting to add the action`
@@ -34,9 +33,11 @@ router.post('/:id', async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:actionId', validateActionId, async (req, res) => {
   try {
-
+    const { actionId } = req.params
+    await db.remove(actionId)
+    res.status(204).end()
   } catch (error) {
     res.status(500).json({
       error: `An error occurred while attempting to delete the action`
@@ -44,15 +45,17 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:actionId', validateActionId, validateActionBody, async (req, res) => {
   try {
-
+    const { actionId } = req.params
+    const { action } = req
+    const updatedAction = await db.update(actionId, action)
+    res.json({ ...updatedAction })
   } catch (error) {
     res.status(500).json({
       error: `An error occurred while attempting to update the action`
     })
   }
 })
-
 
 module.exports = router
