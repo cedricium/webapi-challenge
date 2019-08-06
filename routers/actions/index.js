@@ -15,6 +15,17 @@ router.get('/', async (req, res) => {
   }
 })
 
+router.get('/:actionId', validateActionId, async (req, res) => {
+  try {
+    const { action } = req
+    res.json({ ...action })
+  } catch (error) {
+    res.status(500).json({
+      error: `An error occurred while attempting to get the action`
+    })
+  }
+})
+
 router.post('/', validateActionBody, async (req, res) => {
   try {
     const { action, project } = req
